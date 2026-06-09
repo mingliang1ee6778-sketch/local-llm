@@ -266,3 +266,27 @@
 - To avoid overwriting fork history, pushed the current local work to a separate fork branch instead:
   - `local-agent-worklog-tests`
   - PR URL offered by GitHub: `https://github.com/mingliang1ee6778-sketch/local-llm/pull/new/local-agent-worklog-tests`
+
+### 17:43 KST - Added real web/RAG/Ollama integration test
+- User pointed out that only using fake retriever and fake LLM does not prove the real webpage, Ollama, and RAG chain works.
+- Added:
+  - `tests/test_web_integration.py`
+- Test behavior:
+  - Default `unittest discover` skips the integration test unless explicitly enabled.
+  - Enable with `LOCAL_LLM_RUN_INTEGRATION=1`.
+  - Targets `http://127.0.0.1:8000` by default.
+  - Optional override: `LOCAL_LLM_BASE_URL`.
+- Coverage:
+  - `GET /` verifies the real chat page is served.
+  - `POST /chat` with `你在说什么。` verifies general chat returns no sources.
+  - `POST /chat` with an APDU/PBOC routing question verifies the real RAG + Ollama path returns an answer and sources.
+- Verification:
+  - Ran normal tests:
+    - `.\.venv\Scripts\python.exe -m unittest discover -s tests -v`
+    - Result: `Ran 7 tests`, `OK (skipped=3)`.
+  - Ran real integration tests:
+    - `$env:LOCAL_LLM_RUN_INTEGRATION='1'; .\.venv\Scripts\python.exe -m unittest tests.test_web_integration -v`
+    - Result: `Ran 3 tests in 34.440s`, `OK`.
+  - Ran `py -3.11 -m compileall backend tests`.
+    - Result: success.
+- Updated `README.md` with both fast unit test and real integration test commands.
