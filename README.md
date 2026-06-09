@@ -88,3 +88,6 @@ This workspace has been verified with:
 - Backend URL: `http://127.0.0.1:8000`
 
 See `WORKLOG.md` for the step-by-step execution record.
+
+See `docs/pboc-spec-vectorization.md` for the PBOC standards vectorization method,
+counts, verification results, and current limitations.

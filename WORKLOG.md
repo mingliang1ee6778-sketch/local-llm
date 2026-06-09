@@ -314,3 +314,41 @@
     - Sources: `3`.
     - Source files included `PSE.java` and `PBOC.java`.
     - Result: real RAG + Ollama answer returned.
+
+### 17:57-19:17 KST - Vectorized PBOC specification PDFs
+- User asked whether `data/raw/applet/PBOC/spec` had been fully vectorized.
+- Verified current Chroma first:
+  - Before spec ingest: `total=960`, `code=960`, `spec=0`.
+  - Root cause: earlier ingest used `--source-filter src/com/konai/pboc`, so only the 10 Java source files were embedded.
+- Counted spec inventory:
+  - `86` PDF files.
+  - `1` RAR archive.
+  - Loader supports PDFs; the RAR archive was not unpacked or vectorized.
+- Dry count:
+  - Loaded PDF pages/documents: `5803`.
+  - Chunks created: `6242`.
+- Started full spec ingest with:
+  - `.\.venv\Scripts\python.exe -m backend.ingest.run_ingest --mode applet --source-filter PBOC/spec --batch-size 64`
+- Because CPU-only Ollama embedding was slow, stopped the first run after partial progress and improved `backend/ingest/run_ingest.py`:
+  - Added default skip-existing behavior using generated chunk IDs.
+  - Added `--force` for intentional full re-embedding.
+  - Added flushed progress logs for document loading, chunking, skipping, and batch ingest.
+- Resumed the same command.
+  - It skipped `384` existing chunks and embedded the remaining `5858`.
+- Final Chroma metadata count:
+  - `total=7202`
+  - `code=960`
+  - `spec=6242`
+- Vector DB file:
+  - `data/vectordb/chroma.sqlite3`
+  - Size observed: about `79.7 MB`.
+- Restarted FastAPI after external Chroma writes.
+  - Health check result: `{"status":"ok"}`.
+- Verified direct retriever:
+  - Spec queries now return `PBOC/spec` sources from CN/EN/KR PDFs with page metadata.
+- Verified real `/chat` after restart:
+  - Query: `UICS 2017 debit credit application overview specification 主要说明什么？请根据规范回答。`
+  - Result: `sources=5`, including `PBOC/spec/UICS2017-EN/Basic Specifications/Part I Debit Credit Application Overview.pdf`.
+  - Caveat: the current small local chat model returned a weak answer despite relevant spec sources. Retrieval/vectorization is fixed; answer quality still needs prompt/model/reranking improvement.
+- Added documentation:
+  - `docs/pboc-spec-vectorization.md`
