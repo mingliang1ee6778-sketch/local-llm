@@ -250,3 +250,19 @@
   - Ran `py -3.11 -m compileall backend tests`.
     - Result: success.
 - Added the test command and routing contract to `README.md`.
+
+### 17:33 KST - Version control moved to GitHub fork
+- User asked to record this modification and use version control without updating the originally downloaded repository.
+- Confirmed original remote:
+  - `origin` fetch/push: `https://github.com/bright6778/local-llm`
+- Created GitHub fork under the authenticated account:
+  - `https://github.com/mingliang1ee6778-sketch/local-llm`
+- Added local remote:
+  - `fork`: `https://github.com/mingliang1ee6778-sketch/local-llm.git`
+- Created local commit:
+  - `8c4da75 feat: add local Java Card LLM agent`
+- Did not push to `origin`.
+- Tried pushing to `fork/main`, but GitHub rejected it because `fork/main` already contained remote commits not present locally.
+- To avoid overwriting fork history, pushed the current local work to a separate fork branch instead:
+  - `local-agent-worklog-tests`
+  - PR URL offered by GitHub: `https://github.com/mingliang1ee6778-sketch/local-llm/pull/new/local-agent-worklog-tests`
