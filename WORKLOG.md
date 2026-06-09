@@ -290,3 +290,27 @@
   - Ran `py -3.11 -m compileall backend tests`.
     - Result: success.
 - Updated `README.md` with both fast unit test and real integration test commands.
+
+### 17:48 KST - Replaced external integration test with real agent chat verification
+- User clarified that the desired verification is not another `unittest` file hitting the API, but testing inside the real running agent behavior.
+- Removed:
+  - `tests/test_web_integration.py`
+  - README instructions for `LOCAL_LLM_RUN_INTEGRATION`.
+- Kept:
+  - `tests/test_base_agent.py` as a fast routing regression test only.
+- Real agent verification performed against the running backend:
+  - Target: `http://127.0.0.1:8000/chat`
+  - Runtime path: FastAPI -> cached AppletAgent -> Chroma retriever / direct general-chat branch -> Ollama when RAG is needed.
+- Important test harness note:
+  - A first PowerShell here-string attempt corrupted Chinese input into `????`, which incorrectly forced RAG.
+  - Re-ran with Python Unicode escapes to guarantee the request payload contained real UTF-8 Chinese.
+- Real agent results:
+  - Query: `\u4f60\u5728\u8bf4\u4ec0\u4e48\u3002`
+    - Elapsed: about `0.01s`.
+    - Sources: `0`.
+    - Result: direct clarification answer, no RAG.
+  - Query: `APDU \u5904\u7406\u662f\u600e\u4e48\u5206\u53d1\u5230 PSE\u3001PPSE \u548c\u666e\u901a PBOC \u5b9e\u4f8b\u7684\uff1f`
+    - Elapsed: about `22.24s`.
+    - Sources: `3`.
+    - Source files included `PSE.java` and `PBOC.java`.
+    - Result: real RAG + Ollama answer returned.

@@ -67,21 +67,6 @@ These tests cover the current routing contract:
 - Complaints such as `你刚才答非所问。` return a direct answer with no RAG sources.
 - Project questions mentioning `APDU`, `PBOC`, or `GPO` use the retriever and LLM path.
 
-Run the real web/RAG/Ollama integration smoke test against a running backend:
-
-```powershell
-$env:LOCAL_LLM_RUN_INTEGRATION='1'
-.\.venv\Scripts\python.exe -m unittest tests.test_web_integration -v
-```
-
-This test calls the real local web app at `http://127.0.0.1:8000` by default:
-
-- `GET /` verifies the chat page is served.
-- `POST /chat` with `你在说什么。` verifies general chat returns no RAG sources.
-- `POST /chat` with an APDU/PBOC question verifies the real RAG + Ollama path returns an answer and sources.
-
-Use `LOCAL_LLM_BASE_URL` to target a different backend URL.
-
 ## Current Shape
 
 - One backend, three modes: `applet`, `cos`, `usim`.
